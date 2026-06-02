@@ -1,60 +1,76 @@
 ﻿using Microsoft.Playwright;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
 using System.Threading.Tasks;
-using System.Xml;
+using static Microsoft.Playwright.Assertions;
 
-namespace TestProject1
+namespace TestProject2
 {
     [TestClass]
-    public class BuuRegLoginTest
+    public class SauceDemoLoginTest
     {
-        [TestMethod]
-        public async Task TestStudentLogin()
+        [DataTestMethod]
+        // ใส่ครบทั้ง 8 เคส พร้อม Expected Result ในคอลัมน์ที่ 3
+        [DataRow("standard_user", "secret_sauce", "Logged in successfully")]
+        [DataRow("", "secret_sauce", "Show an error message")]
+        [DataRow("standard_user", "", "Show an error message")]
+        [DataRow("", "", "Show an error message")]
+        [DataRow("problem_user", "secret_sauce", "Logged in successfully")]
+        [DataRow("performance_glitch_user", "secret_sauce", "Logged in successfully")]
+        [DataRow("locked_out_user", "secret_sauce", "Show an error message")]
+        [DataRow("testt_user", "test_sauce", "Show an error message")]
+        public async Task TestMultipleLogins(string username, string password, string expectedResult)
         {
+            // ตัวแปรเก็บสถานะ (เริ่มมาให้เป็น Fail ไว้ก่อน)
+            string status = "Fail";
+            string date = DateTime.Now.ToString("MM/dd/yyyy, HH:mm:ss");
 
-            Console.WriteLine("🚀 กำลังเริ่มต้น Playwright...");
             using var playwright = await Playwright.CreateAsync();
-
-            // เปิดเบราว์เซอร์ให้มองเห็นหน้าต่าง
             await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
             {
                 Headless = false,
-                SlowMo = 1000 // หน่วงเวลาให้มองทัน 0.5 วินาทีต่อคำสั่ง
+                SlowMo = 200 // หน่วงเวลาให้มองทัน 0.5 วินาทีต่อคำสั่ง
             });
 
             var page = await browser.NewPageAsync();
 
-            Console.WriteLine("🔗 กำลังเข้าสู่เว็บไซต์สำนักทะเบียน ม.บูรพา...");
-            await page.GotoAsync("https://eng.buu.ac.th/");
-            await page.GetByRole(AriaRole.Link, new() { Name = "เกี่ยวกับเรา " }).ClickAsync();
-            await page.GetByRole(AriaRole.Link, new() { Name = "ภาควิชา/หน่วยงาน" }).ClickAsync();
-            await page.GetByRole(AriaRole.Link, new() { Name = "เว็บไซต์ภาควิชา" }).First.ClickAsync();
-            await page.GetByRole(AriaRole.Link, new() { Name = "หลักสูตร", Exact = true }).ClickAsync();
-            await page.GetByRole(AriaRole.Heading, new() { Name = "ข่าวประชาสัมพันธ์" }).ClickAsync();
-            await page.GetByText("ข่าวประชาสัมพันธ์ภาควิชาวิศวกรรมอุตสาหการ ม.บูรพา นำคณาจารย์และนิสิตโชว์ศักยภาพ ").ClickAsync();
-            await page.GetByRole(AriaRole.Link, new() { Name = "ติดต่อภาควิชา" }).ClickAsync();
-            await page.GetByRole(AriaRole.Link, new() { Name = "หน้าแรก" }).ClickAsync();
-            await page.GetByRole(AriaRole.Link, new() { Name = "หลักสูตร", Exact = true }).ClickAsync();
-            await page.GetByRole(AriaRole.Link, new() { Name = "เกี่ยวกับภาควิชา" }).HoverAsync();
-            await page.GetByRole(AriaRole.Link, new() { Name = "เจ้าหน้าที่ภาควิชา" }).ClickAsync();
+            try
+            {
+                await page.GotoAsync("https://www.saucedemo.com/");
+                await page.Locator("[data-test='username']").FillAsync(username);
+                await page.Locator("[data-test='password']").FillAsync(password);
+                await page.Locator("[data-test='login-button']").ClickAsync();
 
+                // 🧠 แยกแยะการตรวจสอบตาม Expected Result
+                if (expectedResult == "Logged in successfully")
+                {
+                    // ถ้าคาดหวังให้ผ่าน ต้องเข้าหน้าสินค้าได้
+                    // ปรับ Timeout เป็น 6000 เพื่อเผื่อเวลาให้ performance_glitch_user ด้วย
+                    await Expect(page).ToHaveURLAsync("https://www.saucedemo.com/inventory.html", new() { Timeout = 6000 });
+                }
+                else
+                {
+                    // ถ้าคาดหวังว่าต้อง Error เช็คว่ามีกล่องข้อความสีแดงเด้งขึ้นมา (รอแค่ 2 วินาทีพอ)
+                    await Expect(page.Locator("[data-test='error']")).ToBeVisibleAsync(new() { Timeout = 2000 });
+                }
 
+                // รันรอดมาถึงตรงนี้ได้ แปลว่าระบบทำงานได้ตรงตาม Expectation
+                status = "Pass";
+            }
+            catch (Exception)
+            {
+                status = "Fail";
+                throw;
+            }
+            finally
+            {
+                // 💾 เซฟข้อมูลลงไฟล์ CSV (รูปแบบ: Username : Password, Expected Result, Status, Date)
+                string reportLine = $"{username} : {password},{expectedResult},{status},{date}\n";
+                File.AppendAllText("../../../TestReport.csv", reportLine);
+            }
 
-
-
-
-
-
-
-            //Console.WriteLine("⏸️ หยุดชั่วคราว! เครื่องมือ Inspector จะเด้งขึ้นมาให้คุณสำรวจ...");
-            //// คำสั่งนี้คือทีเด็ด! มันจะหยุดบอทชั่วคราวและเปิดเครื่องมือช่วยหาชื่อช่องกรอกข้อมูลให้คุณ
-            //await newPage.PauseAsync();
-
-
-
+            await browser.CloseAsync();
         }
-
-
     }
 }
