@@ -1,0 +1,76 @@
+[
+  {
+    "Username": "standard_user",
+    "Password": "secret_sauce",
+    "SortOption": "az",
+    "ExpectedFirstItem": "Sauce Labs Backpack"
+  },
+  {
+    "Username": "standard_user",
+    "Password": "secret_sauce",
+    "SortOption": "za",
+    "ExpectedFirstItem": "Test.allTheThings() T-Shirt (Red)"
+  },
+  {
+    "Username": "standard_user",
+    "Password": "secret_sauce",
+    "SortOption": "lohi",
+    "ExpectedFirstItem": "Sauce Labs Onesie"
+  },
+  {
+    "Username": "standard_user",
+    "Password": "secret_sauce",
+    "SortOption": "hilo",
+    "ExpectedFirstItem": "Sauce Labs Fleece Jacket"
+  },
+
+  {
+    "Username": "problem_user",
+    "Password": "secret_sauce",
+    "SortOption": "az",
+    "ExpectedFirstItem": "Sauce Labs Backpack"
+  },
+  {
+    "Username": "problem_user",
+    "Password": "secret_sauce",
+    "SortOption": "za",
+    "ExpectedFirstItem": "Test.allTheThings() T-Shirt (Red)"
+  },
+  {
+    "Username": "problem_user",
+    "Password": "secret_sauce",
+    "SortOption": "lohi",
+    "ExpectedFirstItem": "Sauce Labs Onesie"
+  },
+  {
+    "Username": "problem_user",
+    "Password": "secret_sauce",
+    "SortOption": "hilo",
+    "ExpectedFirstItem": "Sauce Labs Fleece Jacket"
+  },
+
+  {
+    "Username": "performance_glitch_user",
+    "Password": "secret_sauce",
+    "SortOption": "az",
+    "ExpectedFirstItem": "Sauce Labs Backpack"
+  },
+  {
+    "Username": "performance_glitch_user",
+    "Password": "secret_sauce",
+    "SortOption": "za",
+    "ExpectedFirstItem": "Test.allTheThings() T-Shirt (Red)"
+  },
+  {
+    "Username": "performance_glitch_user",
+    "Password": "secret_sauce",
+    "SortOption": "lohi",
+    "ExpectedFirstItem": "Sauce Labs Onesie"
+  },
+  {
+    "Username": "performance_glitch_user",
+    "Password": "secret_sauce",
+    "SortOption": "hilo",
+    "ExpectedFirstItem": "Sauce Labs Fleece Jacket"
+  }
+]

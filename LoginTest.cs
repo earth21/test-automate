@@ -1,7 +1,8 @@
 ﻿using Microsoft.Playwright;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.IO; // 🌟 อย่าลืม using IO สำหรับเขียนไฟล์
+using System.Collections.Generic; // 🌟 เพิ่มสำหรับ List
+using System.IO;
 using System.Threading.Tasks;
 using static Microsoft.Playwright.Assertions;
 using TestProject2.Pages;
@@ -11,10 +12,40 @@ namespace TestProject2
     [TestClass]
     public class LoginTest
     {
+        // ==========================================
+        // ส่วนที่ 1: เตรียมข้อมูล (โมเดล + ฟังก์ชันอ่านไฟล์)
+        // ==========================================
+
+        public class LoginDataModel
+        {
+            public string Username { get; set; }
+            public string Password { get; set; }
+            public string ExpectedResult { get; set; }
+        }
+
+        public static IEnumerable<object[]> GetLoginDataFromJson()
+        {
+            // ชี้ไปที่ไฟล์ JSON ตัวใหม่ที่เราเพิ่งสร้าง
+            string filePath = "../../../LoginTestData.json";
+            string jsonString = File.ReadAllText(filePath);
+
+            var dataList = System.Text.Json.JsonSerializer.Deserialize<List<LoginDataModel>>(jsonString);
+
+            var testCases = new List<object[]>();
+            foreach (var item in dataList)
+            {
+                testCases.Add(new object[] { item.Username, item.Password, item.ExpectedResult });
+            }
+
+            return testCases;
+        }
+
+        // ==========================================
+        // ส่วนที่ 2: ฟังก์ชันเทสต์หลัก
+        // ==========================================
+
         [DataTestMethod]
-        [DataRow("standard_user", "secret_sauce", "Logged in successfully")]
-        [DataRow("problem_user", "secret_sauce", "Logged in successfully")]
-        
+        [DynamicData(nameof(GetLoginDataFromJson), DynamicDataSourceType.Method)]
         public async Task TestLoginWithPOM(string username, string password, string expectedResult)
         {
             // 📝 เตรียมตัวแปรสำหรับทำ Report
@@ -29,9 +60,10 @@ namespace TestProject2
             }
 
             using var playwright = await Playwright.CreateAsync();
-            await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions { 
+            await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+            {
                 Headless = false,
-                SlowMo = 1000 
+                SlowMo = 1000
             });
             var page = await browser.NewPageAsync();
 

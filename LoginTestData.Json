@@ -1,0 +1,42 @@
+[
+  {
+    "Username": "standard_user",
+    "Password": "secret_sauce",
+    "ExpectedResult": "Logged in successfully"
+  },
+  {
+    "Username": "",
+    "Password": "secret_sauce",
+    "ExpectedResult": "Show an error message"
+  },
+  {
+    "Username": "standard_user",
+    "Password": "",
+    "ExpectedResult": "Show an error message"
+  },
+  {
+    "Username": "",
+    "Password": "",
+    "ExpectedResult": "Show an error message"
+  },
+  {
+    "Username": "problem_user",
+    "Password": "secret_sauce",
+    "ExpectedResult": "Logged in successfully"
+  },
+  {
+    "Username": "performance_glitch_user",
+    "Password": "secret_sauce",
+    "ExpectedResult": "Logged in successfully"
+  },
+  {
+    "Username": "locked_out_user",
+    "Password": "secret_sauce",
+    "ExpectedResult": "Show an error message"
+  },
+  {
+    "Username": "testt_user",
+    "Password": "test_sauce",
+    "ExpectedResult": "Show an error message"
+  }
+]
